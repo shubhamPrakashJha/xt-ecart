@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { Logo } from 'components/atoms';
-import './header.css';
+import { Cart, Logo } from 'components/atoms';
 import { HeaderLogin } from 'components/molecules';
+import './header.css';
 
 type User = {
   name: string;
@@ -13,6 +13,7 @@ interface HeaderProps {
   onLogin: () => void;
   onLogout: () => void;
   onCreateAccount: () => void;
+  cartCount: number;
 }
 
 export const Header = ({
@@ -20,16 +21,18 @@ export const Header = ({
   onLogin,
   onLogout,
   onCreateAccount,
+  cartCount = 0,
 }: HeaderProps) => (
   <header>
     <div className="header-wrapper">
-      <Logo name="ACME" />
+      <Logo name="XT CART" />
       <HeaderLogin
         user={user}
         onLogin={onLogin}
         onLogout={onLogout}
         onCreateAccount={onCreateAccount}
       />
+      <Cart count={cartCount} />
     </div>
   </header>
 );

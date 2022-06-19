@@ -20,6 +20,7 @@ LoggedIn.args = {
   user: {
     name: 'Jane Doe',
   },
+  cartCount: 1,
 };
 
 export const LoggedOut = Template.bind({});
