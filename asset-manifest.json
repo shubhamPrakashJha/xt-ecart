@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/xt-ecart/static/css/main.9054d5bd.css",
+    "main.js": "/xt-ecart/static/js/main.6f45bb24.js",
+    "static/js/787.cc1b8f0b.chunk.js": "/xt-ecart/static/js/787.cc1b8f0b.chunk.js",
+    "index.html": "/xt-ecart/index.html",
+    "main.9054d5bd.css.map": "/xt-ecart/static/css/main.9054d5bd.css.map",
+    "main.6f45bb24.js.map": "/xt-ecart/static/js/main.6f45bb24.js.map",
+    "787.cc1b8f0b.chunk.js.map": "/xt-ecart/static/js/787.cc1b8f0b.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9054d5bd.css",
+    "static/js/main.6f45bb24.js"
+  ]
+}
