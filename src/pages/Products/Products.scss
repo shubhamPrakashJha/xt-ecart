@@ -1,0 +1,29 @@
+@media (min-width: 700px){
+  .cardContainer{
+    display: grid;
+    grid-template-columns: 50% 50%;
+  }
+}
+
+@media (min-width: 1024px){
+  .cardContainer{
+    display: grid;
+    grid-template-columns: 25% 25% 25% 25%;
+  }
+}
+
+.cart-popup{
+  width: 300px;
+  max-height: 800px;
+  display: block;
+  position: fixed;
+  right: 0px;
+  background-color: #f1f1f1;
+  overflow: scroll;
+  box-shadow: rgb(0 0 0 / 15%) 0px 0px 0px 1px inset;
+  margin: 16px;
+}
+
+.container{
+  text-align: center;
+}

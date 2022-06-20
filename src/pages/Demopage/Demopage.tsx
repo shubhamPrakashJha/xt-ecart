@@ -18,6 +18,7 @@ export const Demopage: React.FC = () => {
         onLogout={() => setUser(undefined)}
         onCreateAccount={() => setUser({ name: 'Jane Doe' })}
         cartCount={0}
+        onCartClick={() => null}
       />
 
       <section>

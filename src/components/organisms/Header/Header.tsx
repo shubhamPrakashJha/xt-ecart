@@ -14,6 +14,7 @@ interface HeaderProps {
   onLogout: () => void;
   onCreateAccount: () => void;
   cartCount: number;
+  onCartClick: () => void;
 }
 
 export const Header = ({
@@ -22,6 +23,7 @@ export const Header = ({
   onLogout,
   onCreateAccount,
   cartCount = 0,
+  onCartClick,
 }: HeaderProps) => (
   <header>
     <div className="header-wrapper">
@@ -32,7 +34,7 @@ export const Header = ({
         onLogout={onLogout}
         onCreateAccount={onCreateAccount}
       />
-      <Cart count={cartCount} />
+      <Cart count={cartCount} onCartClick={onCartClick} />
     </div>
   </header>
 );

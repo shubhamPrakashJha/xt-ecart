@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Greeting, Logo } from 'components/atoms';
+import { Button, Greeting } from 'components/atoms';
 
 type Props = {
   name: string;
