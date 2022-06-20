@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Card, Hero } from 'components/atoms';
+import { Hero } from 'components/atoms';
 import { CartView } from 'components/molecules';
 import { Header, ProductsCatalogue } from 'components/organisms';
 
