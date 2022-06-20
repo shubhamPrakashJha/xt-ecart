@@ -1,20 +1,12 @@
 /* @flow */
 import * as React from 'react';
-import { Button } from '../Button';
+import { Button } from 'components/atoms';
+import { ProductType } from 'types';
 
 import './Card.scss';
 
-type ProductType = {
-  imgUrl: string;
-  title: string;
-  price: string;
-  isCart?: boolean;
-  addToCart?: () => void;
-  removeFromCart?: () => void;
-};
-
 export function Card({
-  imgUrl,
+  image,
   isCart = false,
   title,
   price,
@@ -24,7 +16,7 @@ export function Card({
   return (
     <div className={'card'}>
       <div className={'card_image'}>
-        <img src={imgUrl} alt="mission patch" width={226} height={226} />
+        <img src={image} alt="mission patch" width={226} height={226} />
       </div>
       <div className={'card_body'}>
         <h4 className={'card_title'}>{title}</h4>

@@ -1,6 +1,10 @@
-import { Button, Card, Hero } from 'components/atoms';
-import { Header } from 'components/organisms';
 import React, { useState, useEffect } from 'react';
+
+import { Card, Hero } from 'components/atoms';
+import { CartView } from 'components/molecules';
+import { Header, ProductsCatalogue } from 'components/organisms';
+
+import { ProductDataType } from 'types';
 
 import './Products.scss';
 
@@ -8,22 +12,13 @@ type User = {
   name: string;
 };
 
-type ProductType = {
-  id: number;
-  title: string;
-  price: string;
-  category: string;
-  description: string;
-  image: string;
-};
-
 export function Products() {
   const [user, setUser] = React.useState<User>();
-  const [cart, setCart] = useState<ProductType[]>(
+  const [cart, setCart] = useState<ProductDataType[]>(
     JSON.parse(window.localStorage.getItem('cart') || '[]')
   );
   const [isCartVisible, setIsCartVisible] = useState(false);
-  const [products, setProducts] = useState<ProductType[]>([]);
+  const [products, setProducts] = useState<ProductDataType[]>([]);
   const [filter, setFilter] = useState(products);
   const [loading, setLoading] = useState(false);
 
@@ -40,7 +35,9 @@ export function Products() {
   }, []);
 
   const onAddToCart = (product: any) => {
-    setCart([...cart, product]);
+    if (cart.every((c) => c.id !== product.id)) {
+      setCart([...cart, product]);
+    }
   };
 
   const onRemoveFromCart = (id: number) => {
@@ -62,54 +59,6 @@ export function Products() {
     setFilter(updatedList);
   };
 
-  const ShowProducts = () => {
-    return (
-      <div>
-        <div>
-          <Button
-            size="small"
-            onClick={() => setFilter(products)}
-            label="All"
-          />
-          <Button
-            size="small"
-            onClick={() => filterProduct("men's clothing")}
-            label="men's Clothing"
-          />
-          <Button
-            size="small"
-            onClick={() => filterProduct("women's clothing")}
-            label="women's Clothing"
-          />
-          <Button
-            size="small"
-            onClick={() => filterProduct('jewelery')}
-            label="Jewelry"
-          />
-          <Button
-            size="small"
-            onClick={() => filterProduct('electronics')}
-            label="Electronics"
-          />
-        </div>
-        <div className="cardContainer">
-          {filter.map((product: ProductType) => {
-            const { id, image, title, price } = product;
-            return (
-              <Card
-                key={`${title}-${id}`}
-                imgUrl={image}
-                title={title}
-                price={price}
-                addToCart={() => onAddToCart(product)}
-              />
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="container">
       <Header
@@ -121,26 +70,27 @@ export function Products() {
         onCartClick={() => setIsCartVisible(!isCartVisible)}
       />
       {isCartVisible && (
-        <div className="cart-popup">
-          {cart.map((product: ProductType) => {
-            const { id, image, title, price } = product;
-            return (
-              <Card
-                key={`${title}-${id}`}
-                isCart={true}
-                imgUrl={image}
-                title={title}
-                price={price}
-                addToCart={() => onAddToCart(product)}
-                removeFromCart={() => onRemoveFromCart(product.id)}
-              />
-            );
-          })}
-        </div>
+        <CartView productList={cart} removeFromCart={onRemoveFromCart} />
       )}
       <Hero />
-      <h1>Latest Products</h1>
-      <div>{loading ? <Loading /> : <ShowProducts />}</div>
+      {loading ? (
+        <Loading />
+      ) : (
+        <ProductsCatalogue
+          catalogueName="Latest Products"
+          buttonSize="small"
+          categoryList={[
+            "men's clothing",
+            "women's clothing",
+            'jewelery',
+            'electronics',
+          ]}
+          onCategorySelect={filterProduct}
+          onCategoryReset={() => setFilter(products)}
+          productList={filter}
+          onAddToCart={onAddToCart}
+        />
+      )}
     </div>
   );
 }
