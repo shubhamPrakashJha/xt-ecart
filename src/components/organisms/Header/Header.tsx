@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Cart, Logo } from 'components/atoms';
 import { HeaderLogin } from 'components/molecules';
-import './header.css';
+import './header.scss';
 
 type User = {
   name: string;
@@ -25,16 +25,14 @@ export const Header = ({
   cartCount = 0,
   onCartClick,
 }: HeaderProps) => (
-  <header>
-    <div className="header-wrapper">
-      <Logo name="XT CART" />
-      <HeaderLogin
-        user={user}
-        onLogin={onLogin}
-        onLogout={onLogout}
-        onCreateAccount={onCreateAccount}
-      />
-      <Cart count={cartCount} onCartClick={onCartClick} />
-    </div>
+  <header className="header-wrapper">
+    <Logo name="XT CART" />
+    <HeaderLogin
+      user={user}
+      onLogin={onLogin}
+      onLogout={onLogout}
+      onCreateAccount={onCreateAccount}
+    />
+    <Cart count={cartCount} onCartClick={onCartClick} />
   </header>
 );
