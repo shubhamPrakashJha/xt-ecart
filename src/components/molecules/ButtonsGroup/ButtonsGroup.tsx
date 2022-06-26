@@ -19,6 +19,7 @@ export function ButtonsGroup({
       {onReset && <Button size="small" onClick={onReset} label="All" />}
       {labels.map((label) => (
         <Button
+          key={label}
           size="small"
           onClick={onSelect ? () => onSelect(label) : () => null}
           label={label}
