@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import { Hero } from 'components/atoms';
+import { Hero, Pagination } from 'components/atoms';
 import { CartView } from 'components/molecules';
 import { Header, ProductsCatalogue } from 'components/organisms';
 
@@ -13,6 +13,7 @@ type User = {
 };
 
 export function Products() {
+  const first = React.useRef(true);
   const [user, setUser] = React.useState<User>();
   const [cart, setCart] = useState<ProductDataType[]>(
     JSON.parse(window.localStorage.getItem('cart') || '[]')
@@ -20,19 +21,35 @@ export function Products() {
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [products, setProducts] = useState<ProductDataType[]>([]);
   const [filter, setFilter] = useState(products);
+  const [pageData, setPageData] = useState({
+    page: 1,
+    pageCount: 1,
+  });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const getProducts = async () => {
       setLoading(true);
-      const response = await fetch('https://fakestoreapi.com/products');
-      setProducts(await response.clone().json());
-      setFilter(await response.json());
+      const response = await fetch(
+        `http://localhost:4000/api/products?page=${pageData.page}&&limit=100`
+      );
+      const productsData = await response.json();
+
+      setProducts(productsData.records);
+      setFilter(productsData.records);
+      setPageData({
+        page: productsData._metadata.page,
+        pageCount: productsData._metadata.pageCount,
+      });
       setLoading(false);
     };
 
-    getProducts();
-  }, []);
+    if (!first.current) {
+      getProducts();
+    } else {
+      first.current = false;
+    }
+  }, [pageData.page]);
 
   const onAddToCart = (product: any) => {
     if (cart.every((c) => c.id !== product.id)) {
@@ -50,6 +67,13 @@ export function Products() {
 
   const Loading = () => {
     return <>Loading...</>;
+  };
+
+  const onPageSelect = (index: number) => {
+    setPageData({
+      page: index,
+      pageCount: pageData.pageCount,
+    });
   };
 
   const filterProduct = (category: string) => {
@@ -91,6 +115,11 @@ export function Products() {
           onAddToCart={onAddToCart}
         />
       )}
+      <Pagination
+        pageCount={pageData.pageCount}
+        current={pageData.page}
+        onClickHandler={onPageSelect}
+      />
     </div>
   );
 }
