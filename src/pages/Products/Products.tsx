@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Hero, Pagination } from 'components/atoms';
 import { CartView } from 'components/molecules';
 import { Header, ProductsCatalogue } from 'components/organisms';
+import { useDataApi } from 'services';
 
 import { ProductDataType } from 'types';
 
@@ -13,43 +14,32 @@ type User = {
 };
 
 export function Products() {
-  const first = React.useRef(true);
   const [user, setUser] = React.useState<User>();
   const [cart, setCart] = useState<ProductDataType[]>(
     JSON.parse(window.localStorage.getItem('cart') || '[]')
   );
   const [isCartVisible, setIsCartVisible] = useState(false);
-  const [products, setProducts] = useState<ProductDataType[]>([]);
-  const [filter, setFilter] = useState(products);
+  const [{ data: productsData, isLoading, isError }, doFetch] = useDataApi(
+    'http://localhost:4000/api/products',
+    []
+  );
+  const [filter, setFilter] = useState(productsData.records || []);
   const [pageData, setPageData] = useState({
     page: 1,
     pageCount: 1,
   });
-  const [loading, setLoading] = useState(false);
+
+  console.log(productsData, filter);
 
   useEffect(() => {
-    const getProducts = async () => {
-      setLoading(true);
-      const response = await fetch(
-        `http://localhost:4000/api/products?page=${pageData.page}&&limit=100`
-      );
-      const productsData = await response.json();
-
-      setProducts(productsData.records);
-      setFilter(productsData.records);
+    setFilter(productsData.records);
+    if (productsData?._metadata) {
       setPageData({
         page: productsData._metadata.page,
         pageCount: productsData._metadata.pageCount,
       });
-      setLoading(false);
-    };
-
-    if (!first.current) {
-      getProducts();
-    } else {
-      first.current = false;
     }
-  }, [pageData.page]);
+  }, [productsData]);
 
   const onAddToCart = (product: any) => {
     if (cart.every((c) => c.id !== product.id)) {
@@ -70,6 +60,7 @@ export function Products() {
   };
 
   const onPageSelect = (index: number) => {
+    doFetch(`http://localhost:4000/api/products?page=${index}&&limit=100`);
     setPageData({
       page: index,
       pageCount: pageData.pageCount,
@@ -77,8 +68,8 @@ export function Products() {
   };
 
   const filterProduct = (category: string) => {
-    const updatedList = products.filter(
-      (product) => product.category === category
+    const updatedList = productsData.records.filter(
+      (product: ProductDataType) => product.category === category
     );
     setFilter(updatedList);
   };
@@ -97,7 +88,8 @@ export function Products() {
         <CartView productList={cart} removeFromCart={onRemoveFromCart} />
       )}
       <Hero />
-      {loading ? (
+      {isError && <div>Something went wrong ...</div>}
+      {isLoading ? (
         <Loading />
       ) : (
         <ProductsCatalogue
@@ -110,8 +102,8 @@ export function Products() {
             'electronics',
           ]}
           onCategorySelect={filterProduct}
-          onCategoryReset={() => setFilter(products)}
-          productList={filter}
+          onCategoryReset={() => setFilter(productsData.records)}
+          productList={filter || []}
           onAddToCart={onAddToCart}
         />
       )}
