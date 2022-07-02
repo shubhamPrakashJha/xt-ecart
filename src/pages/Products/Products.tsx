@@ -15,21 +15,30 @@ type User = {
 
 export function Products() {
   const [user, setUser] = React.useState<User>();
-  const [cart, setCart] = useState<ProductDataType[]>(
-    JSON.parse(window.localStorage.getItem('cart') || '[]')
-  );
   const [isCartVisible, setIsCartVisible] = useState(false);
-  const [{ data: productsData, isLoading, isError }, doFetch] = useDataApi(
-    'http://localhost:4000/api/products',
-    []
-  );
-  const [filter, setFilter] = useState(productsData.records || []);
+  const [
+    {
+      data: productsData,
+      isLoading: isProductsLoading,
+      isError: isProductsError,
+    },
+    fetchProducts,
+  ] = useDataApi('http://localhost:4000/api/products', []);
+  const [cart, setCart] = useState<ProductDataType[]>([]);
+  const [filter, setFilter] = useState<ProductDataType[]>(productsData.records);
   const [pageData, setPageData] = useState({
     page: 1,
     pageCount: 1,
   });
 
-  console.log(productsData, filter);
+  useEffect(() => {
+    const fetchCart = async () => {
+      const response = await fetch(`http://localhost:4000/api/cart/`);
+      const result = await response.json();
+      setCart(result.records);
+    };
+    fetchCart();
+  }, []);
 
   useEffect(() => {
     setFilter(productsData.records);
@@ -41,26 +50,39 @@ export function Products() {
     }
   }, [productsData]);
 
-  const onAddToCart = (product: any) => {
-    if (cart.every((c) => c.id !== product.id)) {
-      setCart([...cart, product]);
-    }
+  const onAddToCart = async (product: any) => {
+    const addToCart = async () => {
+      const response = await fetch(
+        `http://localhost:4000/api/cart/${product.id}`,
+        {
+          method: 'POST',
+        }
+      );
+      const result = await response.json();
+      setCart(result.records);
+    };
+    addToCart();
   };
 
   const onRemoveFromCart = (id: number) => {
-    setCart([...cart.filter((product) => product.id !== id)]);
+    const addToCart = async () => {
+      const response = await fetch(`http://localhost:4000/api/cart/${id}`, {
+        method: 'DELETE',
+      });
+      const result = await response.json();
+      setCart(result.records);
+    };
+    addToCart();
   };
-
-  useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
 
   const Loading = () => {
     return <>Loading...</>;
   };
 
   const onPageSelect = (index: number) => {
-    doFetch(`http://localhost:4000/api/products?page=${index}&&limit=100`);
+    fetchProducts(
+      `http://localhost:4000/api/products?page=${index}&&limit=100`
+    );
     setPageData({
       page: index,
       pageCount: pageData.pageCount,
@@ -81,15 +103,15 @@ export function Products() {
         onLogin={() => setUser({ name: 'Jane Doe' })}
         onLogout={() => setUser(undefined)}
         onCreateAccount={() => setUser({ name: 'Jane Doe' })}
-        cartCount={cart.length}
+        cartCount={cart.length || 0}
         onCartClick={() => setIsCartVisible(!isCartVisible)}
       />
       {isCartVisible && (
         <CartView productList={cart} removeFromCart={onRemoveFromCart} />
       )}
       <Hero />
-      {isError && <div>Something went wrong ...</div>}
-      {isLoading ? (
+      {isProductsError && <div>Something went wrong ...</div>}
+      {isProductsLoading ? (
         <Loading />
       ) : (
         <ProductsCatalogue
