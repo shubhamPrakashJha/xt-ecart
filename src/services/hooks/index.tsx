@@ -1,30 +1,74 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useReducer } from 'react';
+
+enum FetchActionKind {
+  FETCH_INIT = 'FETCH_INIT',
+  FETCH_SUCCESS = 'FETCH_SUCCESS',
+  FETCH_FAILURE = 'FETCH_FAILURE',
+}
+
+// An interface for our actions
+interface FetchAction {
+  type: FetchActionKind;
+  payload?: any;
+}
+
+type FetchState = {
+  isLoading: boolean;
+  isError: boolean;
+  data: any;
+};
+
+const dataFetchReducer = (state: FetchState, action: FetchAction) => {
+  switch (action.type) {
+    case FetchActionKind.FETCH_INIT:
+      return { ...state, isLoading: true, isError: false };
+    case FetchActionKind.FETCH_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        data: action.payload,
+      };
+    case FetchActionKind.FETCH_FAILURE:
+      return { ...state, isLoading: false, isError: true };
+    default:
+      throw new Error();
+  }
+};
 
 export const useDataApi = (initialUrl: string, initialData: any) => {
-  const [data, setData] = useState(initialData);
   const [url, setUrl] = useState(initialUrl);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const [state, dispatch] = useReducer(dataFetchReducer, {
+    isLoading: false,
+    isError: false,
+    data: initialData,
+  });
 
   useEffect(() => {
+    let didCancel = false;
     const fetchData = async () => {
-      setIsError(false);
-      setIsLoading(true);
+      dispatch({ type: FetchActionKind.FETCH_INIT });
 
       try {
         const response = await fetch(url);
         const result = await response.json();
 
-        setData(result);
+        if (!didCancel) {
+          dispatch({ type: FetchActionKind.FETCH_SUCCESS, payload: result });
+        }
       } catch (error) {
-        setIsError(true);
+        if (!didCancel) {
+          dispatch({ type: FetchActionKind.FETCH_FAILURE });
+        }
       }
-
-      setIsLoading(false);
     };
 
     fetchData();
+
+    return () => {
+      didCancel = true;
+    };
   }, [url]);
 
-  return [{ data, isLoading, isError }, setUrl] as const;
+  return [state, setUrl] as const;
 };
