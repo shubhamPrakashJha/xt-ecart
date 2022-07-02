@@ -5,7 +5,13 @@ let cart = [];
 
 // GET all item from cart
 router.get('/', (req, res) => {
-  res.json(cart);
+  response = {
+    _metadata: {
+      totalCount: cart.length,
+    },
+    records: cart,
+  };
+  res.json(response);
 });
 
 // POST a new item in cart
@@ -16,7 +22,14 @@ router.post('/:id', (req, res) => {
   if (cart.every((item) => item.id !== Number(req.params.id))) {
     cart = [...cart, ...itemToAdd];
   }
-  res.json(cart);
+
+  response = {
+    _metadata: {
+      totalCount: cart.length,
+    },
+    records: cart,
+  };
+  res.json(response);
 });
 
 // DELETE item from a cart
@@ -24,8 +37,15 @@ router.delete('/:id', (req, res) => {
   const updatedCart = cart.filter(
     (product) => product.id !== Number(req.params.id)
   );
+
   cart = updatedCart;
-  res.json(cart);
+  response = {
+    _metadata: {
+      totalCount: cart.length,
+    },
+    records: cart,
+  };
+  res.json(response);
 });
 
 // UPDATE item in a cart
